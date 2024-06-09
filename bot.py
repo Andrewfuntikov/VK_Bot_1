@@ -1,39 +1,73 @@
-from _token import token, group_id
-from vk_api.bot_longpoll import VkBotLongPoll
+from vk_api.bot_longpoll import VkBotLongPoll, VkBotEventType
 import vk_api
 import random
+import logging
+
+try:
+    import settings
+except ImportError:
+    exit('DO cp settings.py.default settings.py and set token!')
+log = logging.getLogger("bot")
+
+
+def configure_logging():
+    stream_handler = logging.StreamHandler()
+    stream_handler.setFormatter(logging.Formatter("%(asctime)s %(levelname)s %(message)s"))
+    stream_handler.setLevel(logging.INFO)
+    log.addHandler(stream_handler)
+
+    file_handler = logging.FileHandler("bot.log", encoding='UTF-8')
+    file_handler.setFormatter(logging.Formatter("%(asctime)s %(levelname)s %(message)s"))
+    file_handler.setLevel(logging.DEBUG)
+    log.addHandler(file_handler)
+
+    log.setLevel(logging.DEBUG)
 
 
 class Bot:
+    """
+    Echo bot для vk.com.
+
+    Use: python 3.12.3
+    """
+
     def __init__(self, token, group_id):
+        """
+        :param token: group_id из группы vk
+        :param group_id: секретный токен
+        """
         self.group_id = group_id
         self.token = token
         self.vk = vk_api.VkApi(token=token)
-        self.long_poller = vk_api.bot_longpoll.VkBotLongPoll(self.vk, self.group_id)
+        self.long_poller = VkBotLongPoll(self.vk, self.group_id)
         self.api = self.vk.get_api()
 
     def run(self):
+        """Запуск бота."""
         for event in self.long_poller.listen():
             try:
                 self.on_event(event)
             except Exception as err:
-                print(err)
+                log.exception("Ошибка в обработке события")
 
     def on_event(self, event):
-        if event.type == vk_api.bot_longpoll.VkBotEventType.MESSAGE_NEW:
-            # message = event.obj['message']
-            # text = message['text']
-            # Разобраться в ошибке
+        """Отправляет сообщение назад, если это сообщение текст.
+
+        :param event: VkBotMessageEvent object
+        :return: None
+        """
+        if event.type == VkBotEventType.MESSAGE_NEW:
+            log.debug("Отправляем сообщение назад")
             self.api.messages.send(
-                message=event.object.text,
+                message=event.message.text,
                 random_id=random.randint(0, 2 ** 20),
-                peer_id=event.object.peer_id
+                peer_id=event.message.peer_id
             )
         else:
-            print(f'Мы пока не умеем обрабатывать события такого типа {event.type}')
-
+            log.info(f'Мы пока не умеем обрабатывать события такого типа {event.type}')
 
 
 if __name__ == "__main__":
-    bot = Bot(token, group_id)
+    configure_logging()
+    bot = Bot(settings.GROUP_ID, settings.TOKEN)
     bot.run()

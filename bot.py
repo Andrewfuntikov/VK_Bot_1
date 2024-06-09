@@ -1,4 +1,5 @@
 from vk_api.bot_longpoll import VkBotLongPoll, VkBotEventType
+from settings import TOKEN, GROUP_ID
 import vk_api
 import random
 import logging
@@ -36,9 +37,9 @@ class Bot:
         :param token: group_id из группы vk
         :param group_id: секретный токен
         """
-        self.group_id = group_id
-        self.token = token
-        self.vk = vk_api.VkApi(token=token)
+        self.group_id = GROUP_ID
+        self.token = TOKEN
+        self.vk = vk_api.VkApi(token=TOKEN)
         self.long_poller = VkBotLongPoll(self.vk, self.group_id)
         self.api = self.vk.get_api()
 
@@ -69,5 +70,5 @@ class Bot:
 
 if __name__ == "__main__":
     configure_logging()
-    bot = Bot(settings.GROUP_ID, settings.TOKEN)
+    bot = Bot(GROUP_ID, TOKEN)
     bot.run()

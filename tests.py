@@ -7,13 +7,13 @@ from bot import Bot
 
 
 class Test1(TestCase):
-    RAW_EVENT = {'type': 'message_new',
-                 'object': {'date': 1561646823, 'from_id': 550207343, 'id': 119, 'out': 0,
-                            'peer_id': 550207343, 'text': 'привет', 'conversation_message_id': 119,
-                            'fwd_messages': [], 'important': False, 'random_id': 0, 'attachments': [],
-                            'is_hidden': False},
-                 'group_id': 226178386
-                 }
+    RAW_EVENT = {'group_id': 226178386,
+                 'type': 'message_new',
+                 'event_id': 'd19c88fddb2b18134cd345aff6a0f45cdbf3d111',
+                 'v': '5.199',
+                 'object': {'message': {'date': 1718004277, 'from_id': 838672463, 'id': 114, 'out': 0, 'version': 10000268, 'attachments': [], 'conversation_message_id': 108, 'fwd_messages': [], 'important': False, 'is_hidden': False, 'peer_id': 838672463, 'random_id': 0, 'text': 'авапвпва'},
+                            'client_info': {'button_actions': ['text', 'vkpay', 'open_app', 'location', 'open_link', 'callback', 'intent_subscribe', 'intent_unsubscribe'],
+                                            'keyboard': True, 'inline_keyboard': True, 'carousel': True, 'lang_id': 0}}}
 
     def test_ok(self):
         count = 5
@@ -44,7 +44,7 @@ class Test1(TestCase):
 
                 bot.on_event(event)
         send_mock.assert_called_once_with(
-            message=self.RAW_EVENT['object']['text'],
+            message=self.RAW_EVENT['object']['message']['text'],
             random_id=ANY,
-            peer_id=self.RAW_EVENT['object']['peer_id'],
+            peer_id=self.RAW_EVENT['object']['message']['peer_id'],
         )

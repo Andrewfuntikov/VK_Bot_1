@@ -1,10 +1,10 @@
 from vk_api.bot_longpoll import VkBotLongPoll, VkBotEventType
-import handlers
 from settings import TOKEN, GROUP_ID
+import handlers
 import vk_api
 import random
 import logging
-import scenarios
+
 try:
     import settings
 except ImportError:
@@ -81,16 +81,16 @@ class Bot:
             text_to_send = self.continue_scenario(user_id, text)
         else:
             # search intent
-            for intent in scenarios.INTENTS:
+            for intent in settings.INTENTS:
                 log.debug(f'User gets {intent}')
-                if any(token in text for token in intent['tokens']):
+                if any(token in text.lower() for token in intent['tokens']):
                     if intent['answer']:
                         text_to_send = intent['answer']
                     else:
                         text_to_send = self.start_scenario(user_id, intent['scenario'])
                     break
             else:
-                text_to_send = scenarios.DEFAULT_ANSWER
+                text_to_send = settings.DEFAULT_ANSWER
         self.api.messages.send(
             message=text_to_send,
             random_id=random.randint(0, 2 ** 20),
@@ -98,7 +98,7 @@ class Bot:
         )
 
     def start_scenario(self, user_id, scenario_name):
-        scenario = scenarios.SCENARIOS[scenario_name]
+        scenario = settings.SCENARIOS[scenario_name]
         first_step = scenario['first_step']
         step = scenario['steps'][first_step]
         text_to_send = step['text']
@@ -107,7 +107,7 @@ class Bot:
 
     def continue_scenario(self, user_id, text):
         state = self.user_states[user_id]
-        steps = scenarios.SCENARIOS[state.scenario_name]['steps']
+        steps = settings.SCENARIOS[state.scenario_name]['steps']
         step = steps[state.step_name]
         handler = getattr(handlers, step['handler'])
         if handler(text=text, context=state.context):
@@ -119,7 +119,7 @@ class Bot:
                 state.step_name = step['next_step']
             else:
                 # finish scenario
-                log.info(f'Зарегистрирован: {text} {text}'.format(**state.context))
+                log.info('Зарегистрирован: {name}   {email}'.format(**state.context))
                 self.user_states.pop(user_id)
         else:
             # retry current step

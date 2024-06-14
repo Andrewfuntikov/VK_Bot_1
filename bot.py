@@ -8,7 +8,7 @@ import logging
 try:
     import settings
 except ImportError:
-    exit('DO cp settings.py.default settings.py and set token!')
+    exit('DO cp settings.py.default and set token and group id!')
 log = logging.getLogger("bot")
 
 

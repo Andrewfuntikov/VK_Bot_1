@@ -1,9 +1,20 @@
 from copy import deepcopy
 from unittest import TestCase
 from unittest.mock import patch, Mock, ANY
+
+from pony.orm import db_session, rollback
 from vk_api.bot_longpoll import VkBotMessageEvent, VkBotEvent
 from bot import Bot
 import settings
+
+
+def isolate_db(test_func):
+    def wrapper(*args, **kwargs):
+        with db_session as session:
+            test_func(*args, **kwargs)
+            rollback()
+
+    return wrapper()
 
 
 class Test1(TestCase):
@@ -56,6 +67,7 @@ class Test1(TestCase):
         settings.SCENARIOS['registration']['steps']['step3']['text'].format(name='Венеамин', email='email@email.ru')
     ]
 
+    @isolate_db
     def test_run_ok(self):
         send_mock = Mock()
         api_mock = Mock()

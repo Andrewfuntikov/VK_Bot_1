@@ -3,6 +3,7 @@ charset-normalizer==3.3.2
 coverage==7.5.3
 enum34==1.1.10
 idna==3.7
+pillow==10.3.0
 pony==0.7.17
 psycopg2==2.9.9
 requests==2.32.3

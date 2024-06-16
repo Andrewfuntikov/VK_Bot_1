@@ -1,7 +1,7 @@
 from copy import deepcopy
 from unittest import TestCase
 from unittest.mock import patch, Mock, ANY
-
+from generate_ticket import generate_ticket
 from pony.orm import db_session, rollback
 from vk_api.bot_longpoll import VkBotMessageEvent, VkBotEvent
 from bot import Bot
@@ -93,3 +93,13 @@ class Test1(TestCase):
             args, kwargs = call
             real_outputs.append(kwargs['message'])
         assert real_outputs == self.EXPECTED_OUTPUTS
+
+    def test_image_generation(self):
+        with open('files/ticket-example.jpg', 'rb') as avatar_file:
+            avatar_mock = Mock()
+            avatar_mock.content = avatar_file.read()
+        with patch('requests.get', return_value=avatar_mock):
+            ticket_file = generate_ticket('Qwe', 'Asd')
+        with open('files/ticket-example.png', 'rb') as excpected_file:
+            excpected_bytes = excpected_file.read()
+        assert ticket_file.read() == excpected_bytes

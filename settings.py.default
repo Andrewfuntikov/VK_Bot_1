@@ -40,6 +40,7 @@ SCENARIOS = {
             },
             "step3": {
                 "text": "Спасибо за регистрацию, {name}! Мы отправили на {email} билет, распечатайте его.",
+                "image": "generate_ticket_handler",
                 "failure_text": None,
                 "handler": None,
                 "next_step": None
@@ -50,7 +51,7 @@ SCENARIOS = {
 DEFAULT_ANSWER = 'Не знаю как на это ответить.' \
                  'Могу сказать когда и где пройдет конференция, а также зарегистрировать вас. Просто спросите'
 DB_CONFIG = dict(provider='postgres',
-        user='postgres',
-        # add password='your password'
-        host='localhost',
-        database='VK_BOT_1')
+                 user='postgres',
+                 host='localhost',
+                 password='1234',
+                 database='VK_BOT_1')
